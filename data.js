@@ -7,12 +7,12 @@ const PORTFOLIO_DATA = {
 
   // ── PERFIL ──────────────────────────────────────────────
   profile: {
-    name: "Tu Nombre Completo",
+    name: "Sergio Acevedo",
     title: "Desarrollador Web Full Stack",
     tagline: "Construyo experiencias digitales modernas y funcionales",
-    email: "tuemail@ejemplo.com",
-    github: "https://github.com/tu-usuario",
-    linkedin: "https://linkedin.com/in/tu-usuario",
+    email: "sergioarmandoacevedo@gmail.com",
+    github: "https://github.com/SAAC404",
+    linkedin: "https://www.linkedin.com/in/saac21/",
     avatar: "assets/avatar.jpg",  // Pon tu foto aquí, o deja "" para usar iniciales
     about: `Soy desarrollador web apasionado por crear aplicaciones rápidas, accesibles y elegantes. 
 Me especializo en tecnologías modernas del ecosistema JavaScript y disfruto aprender 
