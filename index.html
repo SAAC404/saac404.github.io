@@ -836,7 +836,6 @@
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <a href="#hero" class="nav-logo" id="nav-logo">Portfolio</a>
   <ul class="nav-links" id="nav-links">
@@ -850,7 +849,6 @@
 </nav>
 
 <main>
-  <!-- HERO -->
   <section id="hero">
     <p class="hero-eyebrow" id="hero-eyebrow-text">Disponible para proyectos</p>
     <h1 class="hero-name" id="hero-h1">Cargando...</h1>
@@ -861,7 +859,6 @@
 
   <hr class="divider" />
 
-  <!-- SOBRE MÍ -->
   <section id="sobre-mi">
     <p class="section-label">Sobre mí</p>
     <div class="about-grid fade-up">
@@ -896,17 +893,15 @@
 
   <hr class="divider" />
 
-  <!-- PROYECTOS -->
   <section id="proyectos">
     <p class="section-label">Trabajo</p>
     <h2 class="section-title fade-up">Proyectos destacados</h2>
-    <p class="section-sub fade-up">Selección de proyectos en los que he aplicado mis habilidades de desarrollo web.</p>
+    <p class="section-sub fade-up">Selección de proyectos en los que he aplicado mis habilidades.</p>
     <div class="projects-grid stagger fade-up" id="projects-grid"></div>
   </section>
 
   <hr class="divider" />
 
-  <!-- CERTIFICACIONES -->
   <section id="certificaciones">
     <p class="section-label">Logros</p>
     <h2 class="section-title fade-up">Certificaciones &amp; reconocimientos</h2>
@@ -917,7 +912,6 @@
 
   <hr class="divider" />
 
-  <!-- INSIGNIAS CREDLY -->
   <section id="insignias">
     <p class="section-label">Credly</p>
     <div class="credly-header">
@@ -943,7 +937,6 @@
     </div>
   </section>
 
-  <!-- CONTACTO -->
   <section id="contacto">
     <p class="section-label">Contacto</p>
     <h2 class="section-title fade-up">¿Trabajamos juntos?</h2>
@@ -952,7 +945,6 @@
   </section>
 </main>
 
-<!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Vista de certificado">
   <div class="lightbox-inner">
     <button class="lightbox-close" id="lb-close" aria-label="Cerrar">✕</button>
@@ -1037,9 +1029,8 @@
   // ── SKILLS desde Credly ──
   (function () {
     const CREDLY_USER = 'saac21';
-    const PREVIEW_COUNT = 24; // pills visibles antes de "ver más"
+    const PREVIEW_COUNT = 24; 
 
-    // Mapeo de categorías conocidas a colores
     const CAT_ACCENT = {
       'Programming': 'accent',
       'Web Development': 'accent',
@@ -1142,10 +1133,8 @@
           };
           group.appendChild(moreBtn);
         }
-
         wrap.appendChild(group);
       });
-
       container.appendChild(wrap);
     }
 
@@ -1194,21 +1183,35 @@
     grid.appendChild(card);
   });
 
-  // ── CERTIFICATIONS ──
-  const categories = ['todos', ...new Set(D.certifications.map(c => c.category))];
+  // ── CERTIFICACIONES (FILTRADAS POR ÁREA) ──
+  const areas = ['todos', ...new Set(D.certifications.map(c => c.area ? c.area.toLowerCase() : 'otros'))];
   const filtersEl = document.getElementById('cert-filters');
   const certsGrid = document.getElementById('certs-grid');
   let currentFilter = 'todos';
   let activeCerts = [];
 
-  const catLabel = { todos: 'Todos', certificacion: 'Certificaciones', reconocimiento: 'Reconocimientos', constancia: 'Constancias', curso: 'Cursos' };
+  const areaLabel = { 
+    'todos': 'Todas las áreas',
+    'rrhh': 'Recursos Humanos',
+    'it': 'IT / Desarrollo',
+    'logistica': 'Logística / Operaciones',
+    'derecho': 'Derecho',
+    'diseno-3d': 'Diseño 3D',
+    'management': 'Management / Liderazgo',
+    'data': 'Datos / Analítica',
+    'otros': 'Otros'
+  };
 
-  categories.forEach(cat => {
+  const catLabel = { certificacion: 'Certificación', reconocimiento: 'Reconocimiento', constancia: 'Constancia', curso: 'Curso' };
+
+  areas.forEach(area => {
     const btn = document.createElement('button');
-    btn.className = 'filter-btn' + (cat === 'todos' ? ' active' : '');
-    btn.textContent = catLabel[cat] || cat.charAt(0).toUpperCase() + cat.slice(1);
+    btn.className = 'filter-btn' + (area === 'todos' ? ' active' : '');
+    
+    btn.textContent = areaLabel[area] || area.charAt(0).toUpperCase() + area.slice(1);
+    
     btn.onclick = () => {
-      currentFilter = cat;
+      currentFilter = area;
       filtersEl.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       renderCerts();
@@ -1218,7 +1221,12 @@
 
   function renderCerts() {
     certsGrid.innerHTML = '';
-    activeCerts = D.certifications.filter(c => currentFilter === 'todos' || c.category === currentFilter);
+    
+    activeCerts = D.certifications.filter(c => {
+      const itemArea = c.area ? c.area.toLowerCase() : 'otros';
+      return currentFilter === 'todos' || itemArea === currentFilter;
+    });
+
     activeCerts.forEach((c, i) => {
       const card = document.createElement('div');
       card.className = 'cert-card fade-up';
@@ -1231,10 +1239,13 @@
         ? `<img src="${c.image}" alt="${c.title}" loading="lazy" />`
         : `<div class="cert-thumb-placeholder"><span class="cert-icon-big">📄</span></div>`;
 
+      const categoryClass = c.category ? c.category.toLowerCase() : 'otros';
+      const categoryName = catLabel[categoryClass] || categoryClass.charAt(0).toUpperCase() + categoryClass.slice(1);
+
       card.innerHTML = `
         <div class="cert-thumb">
           ${thumbHtml}
-          <span class="cert-badge badge-${c.category}">${catLabel[c.category] || c.category}</span>
+          <span class="cert-badge badge-${categoryClass}">${categoryName}</span>
         </div>
         <div class="cert-body">
           <p class="cert-title">${c.title}</p>
@@ -1319,7 +1330,7 @@
 
   document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
 
-// ── CREDLY BADGES ──
+  // ── CREDLY BADGES ──
   (function () {
     const CREDLY_USER = 'saac21';
     const PAGE_SIZE = 48; // Cantidad a mostrar por cada clic en "Cargar más"
@@ -1357,14 +1368,13 @@
       let collectedBadges = [];
       let page = 1;
       let workingProxy = null;
-      let lastFirstId = null; // Evita bucles infinitos si la API repite páginas al llegar al final
+      let lastFirstId = null;
 
       try {
         while (true) {
           const url = `https://www.credly.com/users/${CREDLY_USER}/badges.json?page=${page}`;
           let pageData = null;
 
-          // Optimización: si un proxy ya funcionó, lo intentamos usar primero para las siguientes páginas
           const proxyOrder = workingProxy ? [workingProxy, ...proxies.filter(p => p !== workingProxy)] : proxies;
 
           for (const makeProxy of proxyOrder) {
@@ -1372,7 +1382,7 @@
               const data = await fetchPageWithProxy(makeProxy, url);
               if (data && (data.data || data.badges)) {
                 pageData = data;
-                workingProxy = makeProxy; // Guardar el proxy que respondió exitosamente
+                workingProxy = makeProxy; 
                 break;
               }
             } catch (_) { continue; }
@@ -1380,13 +1390,12 @@
 
           if (!pageData) {
             if (page === 1) throw new Error('all proxies failed');
-            break; // Si falla la red en las páginas siguientes, nos quedamos con lo que ya pudimos cargar
+            break; 
           }
 
           const batch = pageData.data || pageData.badges || [];
           
           if (batch.length > 0) {
-            // Validar que Credly no esté repitiendo la última página constantemente
             const currentFirstId = (batch[0].badge_template || batch[0]).id || batch[0].name;
             if (currentFirstId === lastFirstId) {
               break; 
@@ -1396,15 +1405,14 @@
             collectedBadges = collectedBadges.concat(batch);
             page++;
             
-            // Límite de seguridad de 15 páginas (aprox 750 insignias) por si hay un error en la API
             if (page > 15) break; 
           } else {
-            break; // Array vacío, ya no hay más insignias por cargar
+            break; 
           }
         }
 
         allBadges = collectedBadges;
-        const totalCount = allBadges.length; // Ahora contamos el total real obtenido, no el metadata
+        const totalCount = allBadges.length; 
         renderStats(totalCount);
         
         filtered = allBadges;
@@ -1492,8 +1500,9 @@
     });
 
     fetchAllBadges();
-  })();
-})();
+  })(); // Cierra función de Credly
+
+})(); // Cierra función principal
 </script>
 </body>
 </html>
