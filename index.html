@@ -1322,31 +1322,72 @@
         </div>`;
     }
 
+    async function fetchPageWithProxy(makeProxy, url) {
+      const res = await fetch(makeProxy(url));
+      if (!res.ok) return null;
+      const text = await res.text();
+      let parsed;
+      try { parsed = JSON.parse(text); } catch { return null; }
+      return parsed.contents ? JSON.parse(parsed.contents) : parsed;
+    }
+
     async function fetchAllBadges() {
       const proxies = [
         url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
         url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
         url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
       ];
-      const credlyUrl = `https://www.credly.com/users/${CREDLY_USER}/badges.json`;
-      let data = null;
+      const CREDLY_PAGE_SIZE = 48; // Credly's default page size
+      let collectedBadges = [];
+      let totalCount = 0;
+
       try {
+        // Fetch first page to get total count and first batch
+        let workingProxy = null;
+        let firstData = null;
+
         for (const makeProxy of proxies) {
           try {
-            const res = await fetch(makeProxy(credlyUrl));
-            if (!res.ok) continue;
-            const text = await res.text();
-            // allorigins devuelve { contents: "..." }, los demás devuelven JSON directo
-            let parsed;
-            try { parsed = JSON.parse(text); } catch { continue; }
-            data = parsed.contents ? JSON.parse(parsed.contents) : parsed;
-            if (data && (data.data || data.badges)) break;
+            const url = `https://www.credly.com/users/${CREDLY_USER}/badges.json?page=1&page_size=${CREDLY_PAGE_SIZE}`;
+            const data = await fetchPageWithProxy(makeProxy, url);
+            if (data && (data.data || data.badges)) {
+              firstData = data;
+              workingProxy = makeProxy;
+              break;
+            }
           } catch (_) { continue; }
         }
-        if (!data) throw new Error('all proxies failed');
-        allBadges = data.data || data.badges || [];
-        const total = data.metadata?.total_count || allBadges.length;
-        renderStats(total);
+
+        if (!firstData) throw new Error('all proxies failed');
+
+        const firstBatch = firstData.data || firstData.badges || [];
+        collectedBadges = collectedBadges.concat(firstBatch);
+        totalCount = firstData.metadata?.total_count || firstBatch.length;
+
+        // Calculate how many additional pages we need
+        const totalPages = Math.ceil(totalCount / CREDLY_PAGE_SIZE);
+
+        // Fetch remaining pages
+        for (let page = 2; page <= totalPages; page++) {
+          try {
+            const url = `https://www.credly.com/users/${CREDLY_USER}/badges.json?page=${page}&page_size=${CREDLY_PAGE_SIZE}`;
+            // Try working proxy first, then fallback to others
+            let pageData = null;
+            const proxyOrder = [workingProxy, ...proxies.filter(p => p !== workingProxy)];
+            for (const makeProxy of proxyOrder) {
+              try {
+                const data = await fetchPageWithProxy(makeProxy, url);
+                if (data && (data.data || data.badges)) { pageData = data; break; }
+              } catch (_) { continue; }
+            }
+            if (pageData) {
+              collectedBadges = collectedBadges.concat(pageData.data || pageData.badges || []);
+            }
+          } catch (_) { /* skip failed page */ }
+        }
+
+        allBadges = collectedBadges;
+        renderStats(totalCount);
         filtered = allBadges;
         skeleton.remove();
         shown = 0;
