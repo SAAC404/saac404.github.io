@@ -1,130 +1,79 @@
-# 🚀 Portafolio GitHub Pages
+# 🚀 Arquitectura de Portafolio Dinámico (Vanilla JS)
 
-Portafolio personal para desarrolladores web. Solo necesitas editar **`data.js`** para mantenerlo actualizado.
+Un portafolio web de alto rendimiento diseñado para desarrolladores de software. Construido sin dependencias de frameworks externos, prioriza la velocidad de carga, la accesibilidad y la mantenibilidad modular.
 
----
+Destaca por su integración dinámica con la API de Credly mediante un sistema de proxy rotativo para eludir restricciones de CORS, renderizando insignias digitales en tiempo real.
 
-## 📁 Estructura del proyecto
-
-```
-portfolio-github-pages/
-├── index.html          ← La página (no necesitas tocarla)
-├── data.js             ← TU ARCHIVO: edita aquí cada semana ✏️
-├── README.md           ← Esta guía
-└── assets/
-    ├── avatar.jpg      ← Tu foto de perfil
-    ├── projects/       ← Imágenes de proyectos (800×500 px)
-    │   ├── ecommerce.jpg
-    │   └── ...
-    └── certs/          ← Tus certificados en .jpg (recomendado 1200×900 px)
-        ├── freecodecamp-rwd.jpg
-        └── ...
-```
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
 
 ---
 
-## ⚡ Despliegue inicial en GitHub Pages
+## 📐 Características Arquitectónicas
 
-1. **Crea un repositorio** en GitHub llamado `tu-usuario.github.io`
-   (o cualquier nombre, p. ej. `portfolio`)
-
-2. **Sube todos los archivos** del proyecto:
-   ```bash
-   git init
-   git add .
-   git commit -m "🚀 Portafolio inicial"
-   git branch -M main
-   git remote add origin https://github.com/TU-USUARIO/tu-usuario.github.io.git
-   git push -u origin main
-   ```
-
-3. **Activa GitHub Pages:**
-   - Ve a Settings → Pages
-   - Branch: `main` / Folder: `/ (root)`
-   - Guarda — en 2 minutos tu sitio estará en `https://tu-usuario.github.io`
+* **Zero Dependencies:** Construido 100% con HTML5, CSS3 moderno (Variables, Grid, Flexbox, Clamp) y Vanilla JavaScript (ES6+).
+* **Gestión de Estado Centralizada:** Toda la información del usuario se inyecta dinámicamente desde un único archivo de configuración (`data.js`), separando la lógica de presentación (UI) de los datos.
+* **Integración API Resiliente:** Consumo asíncrono de la API de Credly implementando un patrón de **Fallback con Múltiples Proxies CORS**. Si un proxy falla, el algoritmo salta automáticamente al siguiente para asegurar la carga de insignias.
+* **Paginación Infinita Lógica:** Algoritmo de extracción de datos que itera sobre la paginación de la API de Credly mediante ciclos `while` y validación de IDs únicos para prevenir bucles infinitos.
+* **Taxonomía y Filtrado Dinámico:** Sistema de filtrado por áreas de conocimiento (RRHH, IT, Management, etc.) generado en tiempo de ejecución basado en los metadatos de los certificados.
+* **Micro-Interacciones UX/UI:** Implementación de *Intersection Observers* para animaciones de entrada (`fade-up`), efectos de *Spotlight* en el Hero basados en las coordenadas del cursor, y *Skeletons* de carga para manejo de latencia.
 
 ---
 
-## ✏️ Actualizar cada semana
+## 📁 Estructura del Proyecto
 
-### Agregar una certificación nueva
+\`\`\`text
+portfolio/
+├── index.html          # Interfaz de usuario, estilos embebidos (CSS) y lógica de renderizado (JS)
+├── data.js             # Base de datos local (JSON-like object) para inyección de contenido
+├── README.md           # Documentación técnica
+└── assets/             # Assets estáticos optimizados
+    ├── avatar.jpg
+    ├── projects/       # Screenshots de proyectos (Aspect ratio 16:9)
+    └── certs/          # Evidencias de certificaciones
+\`\`\`
 
-1. Convierte tu PDF a JPG (usa [smallpdf.com](https://smallpdf.com) o Adobe)
-2. Guarda la imagen en `assets/certs/nombre-certificado.jpg`
-3. Abre `data.js` y agrega un bloque al inicio del array `certifications`:
+---
 
-```js
-{
-  title: "Nombre del Certificado",
-  issuer: "Plataforma o Institución",
-  date: "Julio 2024",
-  category: "certificacion",  // certificacion | reconocimiento | constancia | curso
-  image: "assets/certs/nombre-certificado.jpg",
-  credential: "https://link-a-credencial.com",  // deja "" si no hay link
-},
-```
+## ⚙️ Configuración y Mantenimiento (Data Management)
 
-4. Sube los cambios:
-```bash
-git add .
-git commit -m "✅ Agrego certificado: Nombre del Certificado"
-git push
-```
+El proyecto está diseñado para que no sea necesario tocar el DOM (HTML) ni la lógica de renderizado (JS) para realizar actualizaciones rutinarias. Toda mutación de datos ocurre en `data.js`.
 
-¡Listo! En ~30 segundos aparece en tu portafolio.
+### 1. Actualización del Perfil y Habilidades
+Modifica el objeto `profile` y el array `skills` en `data.js`. Las habilidades detectadas dinámicamente desde Credly se fusionarán con las hardcodeadas en caso de fallo de red.
 
-### Agregar un proyecto nuevo
-
-Agrega un bloque al array `projects` en `data.js`:
-
-```js
+### 2. Inserción de Nuevos Proyectos
+Añade un objeto al array `projects`:
+\`\`\`javascript
 {
   title: "Nombre del Proyecto",
-  description: "Descripción breve de qué hace y qué tecnologías usaste.",
+  description: "Descripción técnica concisa.",
   tags: ["React", "Node.js", "MongoDB"],
-  image: "assets/projects/nombre-proyecto.jpg",  // 800×500 px
-  demo: "https://tu-demo.vercel.app",
-  repo: "https://github.com/tu-usuario/proyecto",
-  featured: false,  // true = aparece más grande (úsalo solo para 1-2 proyectos)
-},
-```
+  image: "assets/projects/img.webp", // Recomendado uso de .webp para optimización LCP
+  demo: "https://demo.url",
+  repo: "https://github.com/user/repo",
+  featured: true // Renderiza la tarjeta en formato hero/ampliado
+}
+\`\`\`
+
+### 3. Gestión de Taxonomía de Certificados
+El sistema genera los botones de filtrado de forma algorítmica leyendo el atributo `area` de cada certificado en el array `certifications`. 
+* **Nota:** Si deseas agregar un área nueva (ej. `marketing`), simplemente inclúyela en el atributo `area`. Para un mapeo de nombre legible, actualiza el diccionario `areaLabel` en el bloque JS de `index.html`.
 
 ---
 
-## 🖼️ Tips para las imágenes
+## 🚀 Despliegue (CI/CD Básico)
 
-| Tipo | Tamaño recomendado | Formato |
-|------|--------------------|---------|
-| Avatar/foto | 400×400 px | JPG/PNG |
-| Proyecto | 800×500 px | JPG |
-| Certificado | 1200×900 px | JPG |
+Al ser una aplicación puramente estática (SSG/Client-side rendering), el proyecto está optimizado para despliegues instantáneos en CDNs globales.
 
-- Para convertir PDFs a JPG: [smallpdf.com](https://smallpdf.com/pdf-to-jpg) o [ilovepdf.com](https://ilovepdf.com)
-- Comprime las imágenes en [squoosh.app](https://squoosh.app) para carga rápida
-- Mantén los JPG de certificados bajo 300 KB cada uno
+**Vía GitHub Pages:**
+1. Inicializa el repositorio local y vincula con GitHub.
+2. Sube la rama `main`.
+3. Navega a **Settings > Pages** y selecciona la rama `main` en la raíz `/`.
+4. El pipeline nativo compilará y servirá el sitio con HTTPS automáticamente.
 
----
-
-## 🎨 Personalización rápida
-
-Edita en `data.js`:
-- **Nombre, título, email, GitHub, LinkedIn** → sección `profile`
-- **Descripción personal** → campo `about`
-- **Barras de habilidades** → array `skills` (nivel de 0 a 100)
+Alternativas viables de alto rendimiento: Vercel, Netlify o Cloudflare Pages.
 
 ---
-
-## 📱 Funcionalidades incluidas
-
-- ✅ Diseño responsive (móvil, tablet, desktop)
-- ✅ Modo oscuro nativo
-- ✅ Filtros por categoría en certificaciones
-- ✅ Lightbox con navegación por teclado (← →, Esc)
-- ✅ Animaciones al hacer scroll
-- ✅ Carga rápida (sin frameworks externos)
-- ✅ Barras de habilidades animadas
-- ✅ Sin dependencias npm — solo HTML + JS vanilla
-
----
-
-*Construido para GitHub Pages — sin build, sin npm, sin complicaciones.*
+*Desarrollado con enfoque en Clean Code, Performance y Experiencia de Usuario.*
