@@ -84,7 +84,15 @@ algo nuevo cada semana.`,
       image: "assets/certs/coursera-hrci-associate-hr-international.webp",
       credential: "https://coursera.org/verify/professional-cert/OJ8RON4HBK08",
     },
-    /*{
+    {
+      title: "Recruiting & Onboarding for Today's Workforce",
+      issuer: "Coursera / Practical Growth",
+      date: "Mayo 2026",
+      category: "certificacion",
+      image: "assets/certs/coursera-recruiting-onboarding-workforce.webp",
+      credential: "https://coursera.org/verify/specialization/YMXUTAW0H8RN",
+    },
+    {
       title: "JavaScript Algorithms & Data Structures",
       issuer: "freeCodeCamp",
       date: "Febrero 2024",
@@ -123,7 +131,7 @@ algo nuevo cada semana.`,
       category: "certificacion",
       image: "assets/certs/coursera-node.jpg",
       credential: "https://coursera.org/verify/ABC123",
-    },*/
+    },
   ],
 
 };
