@@ -1313,20 +1313,17 @@
     }
 
     async function fetchAllBadges() {
-      let page = 1;
-      let total = 0;
       try {
-        while (true) {
-          const url = `https://api.credly.com/v1/obi/v2/public/users/${CREDLY_USER}/badges?page=${page}&page_size=100&sort=-issued_at`;
-          const res = await fetch(url);
-          if (!res.ok) throw new Error('API error');
-          const data = await res.json();
-          const items = data.data || [];
-          allBadges = allBadges.concat(items);
-          total = data.metadata?.total_count || allBadges.length;
-          if (allBadges.length >= total || items.length === 0) break;
-          page++;
-        }
+        // Endpoint público de Credly + proxy AllOrigins para evitar bloqueo CORS
+        const credlyUrl = `https://www.credly.com/users/${CREDLY_USER}/badges.json`;
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(credlyUrl)}`;
+        const res = await fetch(proxyUrl);
+        if (!res.ok) throw new Error('proxy error');
+        const wrapper = await res.json();
+        const data = JSON.parse(wrapper.contents);
+        // El JSON de Credly tiene { badges: [...], metadata: {...} }
+        allBadges = data.badges || data.data || [];
+        const total = data.metadata?.total_count || allBadges.length;
         renderStats(total);
         filtered = allBadges;
         skeleton.remove();
@@ -1347,15 +1344,14 @@
 
     function renderStats(total) {
       const statsEl = document.getElementById('badges-stats');
-      // Count unique issuers
-      const issuers = new Set(allBadges.map(b => b.badge?.issuer?.name || b.issuer?.name || '').filter(Boolean));
+      const issuers = new Set(allBadges.map(b => b.issuer?.entities?.[0]?.entity?.name || b.badge_template?.issuer?.entities?.[0]?.entity?.name || '').filter(Boolean));
       statsEl.innerHTML = `
         <div class="badge-stat">
           <div class="badge-stat-num">${total}</div>
           <div class="badge-stat-label">Insignias</div>
         </div>
         <div class="badge-stat">
-          <div class="badge-stat-num">${issuers.size}</div>
+          <div class="badge-stat-num">${issuers.size || '—'}</div>
           <div class="badge-stat-label">Emisores</div>
         </div>`;
     }
@@ -1369,10 +1365,14 @@
       const grid = document.getElementById('badges-grid');
       const slice = filtered.slice(shown, shown + PAGE_SIZE);
       slice.forEach(b => {
-        const img = b.badge?.image_url || b.image?.url || '';
-        const name = b.badge?.name || b.name || 'Insignia';
-        const issuer = b.badge?.issuer?.name || b.issuer?.name || '';
-        const url = b.badge_url || b.public_url || `https://www.credly.com/users/${CREDLY_USER}`;
+        // Estructura real del JSON de Credly
+        const tmpl = b.badge_template || b;
+        const img = tmpl.image_url || b.image?.url || '';
+        const name = tmpl.name || b.name || 'Insignia';
+        const issuer = tmpl.issuer?.entities?.[0]?.entity?.name || tmpl.issuer_name || '';
+        const url = b.id
+          ? `https://www.credly.com/badges/${b.id}`
+          : `https://www.credly.com/users/${CREDLY_USER}`;
         const card = document.createElement('a');
         card.className = 'badge-card';
         card.href = url;
@@ -1401,8 +1401,9 @@
         const q = e.target.value.toLowerCase().trim();
         filtered = q
           ? allBadges.filter(b => {
-              const name = (b.badge?.name || b.name || '').toLowerCase();
-              const issuer = (b.badge?.issuer?.name || b.issuer?.name || '').toLowerCase();
+              const tmpl = b.badge_template || b;
+              const name = (tmpl.name || b.name || '').toLowerCase();
+              const issuer = (tmpl.issuer?.entities?.[0]?.entity?.name || tmpl.issuer_name || '').toLowerCase();
               return name.includes(q) || issuer.includes(q);
             })
           : allBadges;
