@@ -479,18 +479,20 @@
   }
   .cert-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
   .cert-thumb {
-    aspect-ratio: 16/10;
+    aspect-ratio: 4/3;
     background: var(--surface2);
     overflow: hidden;
     position: relative;
   }
   .cert-thumb img {
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
+    object-position: center;
     background: var(--surface2);
     transition: transform 0.4s ease;
   }
-  .cert-card:hover .cert-thumb img { transform: scale(1.04); }
+  .cert-card:hover .cert-thumb img { transform: scale(1.02); }
   .cert-thumb-placeholder {
     width: 100%; height: 100%;
     display: flex;
@@ -506,17 +508,22 @@
     position: absolute;
     top: 0.6rem;
     left: 0.6rem;
+    z-index: 2;
     font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    padding: 3px 9px;
-    border-radius: 100px;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.86);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #7DF4C5;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
   }
-  .badge-certificacion { background: rgba(125,244,197,0.15); color: var(--accent); }
-  .badge-reconocimiento { background: rgba(255,193,80,0.15); color: #FFC150; }
-  .badge-constancia { background: rgba(91,158,255,0.15); color: var(--accent2); }
-  .badge-curso { background: rgba(190,130,255,0.15); color: #BE82FF; }
+  .badge-certificacion { color: #7DF4C5; }
+  .badge-reconocimiento { color: #FFC150; }
+  .badge-constancia { color: #8FC2FF; }
+  .badge-curso { color: #D1A6FF; }
   .cert-body { padding: 1rem 1.1rem 1.25rem; }
   .cert-title {
     font-size: 0.95rem;
@@ -1312,10 +1319,10 @@
 
   document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
 
-  // ── CREDLY BADGES ──
+// ── CREDLY BADGES ──
   (function () {
     const CREDLY_USER = 'saac21';
-    const PAGE_SIZE = 48;
+    const PAGE_SIZE = 48; // Cantidad a mostrar por cada clic en "Cargar más"
     let allBadges = [];
     let filtered = [];
     let shown = 0;
@@ -1346,53 +1353,60 @@
         url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
         url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
       ];
-      const CREDLY_PAGE_SIZE = 48;
+      
       let collectedBadges = [];
-      let totalCount = 0;
+      let page = 1;
+      let workingProxy = null;
+      let lastFirstId = null; // Evita bucles infinitos si la API repite páginas al llegar al final
 
       try {
-        let workingProxy = null;
-        let firstData = null;
+        while (true) {
+          const url = `https://www.credly.com/users/${CREDLY_USER}/badges.json?page=${page}`;
+          let pageData = null;
 
-        for (const makeProxy of proxies) {
-          try {
-            const url = `https://www.credly.com/users/${CREDLY_USER}/badges.json?page=1&page_size=${CREDLY_PAGE_SIZE}`;
-            const data = await fetchPageWithProxy(makeProxy, url);
-            if (data && (data.data || data.badges)) {
-              firstData = data;
-              workingProxy = makeProxy;
-              break;
+          // Optimización: si un proxy ya funcionó, lo intentamos usar primero para las siguientes páginas
+          const proxyOrder = workingProxy ? [workingProxy, ...proxies.filter(p => p !== workingProxy)] : proxies;
+
+          for (const makeProxy of proxyOrder) {
+            try {
+              const data = await fetchPageWithProxy(makeProxy, url);
+              if (data && (data.data || data.badges)) {
+                pageData = data;
+                workingProxy = makeProxy; // Guardar el proxy que respondió exitosamente
+                break;
+              }
+            } catch (_) { continue; }
+          }
+
+          if (!pageData) {
+            if (page === 1) throw new Error('all proxies failed');
+            break; // Si falla la red en las páginas siguientes, nos quedamos con lo que ya pudimos cargar
+          }
+
+          const batch = pageData.data || pageData.badges || [];
+          
+          if (batch.length > 0) {
+            // Validar que Credly no esté repitiendo la última página constantemente
+            const currentFirstId = (batch[0].badge_template || batch[0]).id || batch[0].name;
+            if (currentFirstId === lastFirstId) {
+              break; 
             }
-          } catch (_) { continue; }
-        }
-
-        if (!firstData) throw new Error('all proxies failed');
-
-        const firstBatch = firstData.data || firstData.badges || [];
-        collectedBadges = collectedBadges.concat(firstBatch);
-        totalCount = firstData.metadata?.total_count || firstBatch.length;
-
-        const totalPages = Math.ceil(totalCount / CREDLY_PAGE_SIZE);
-
-        for (let page = 2; page <= totalPages; page++) {
-          try {
-            const url = `https://www.credly.com/users/${CREDLY_USER}/badges.json?page=${page}&page_size=${CREDLY_PAGE_SIZE}`;
-            let pageData = null;
-            const proxyOrder = [workingProxy, ...proxies.filter(p => p !== workingProxy)];
-            for (const makeProxy of proxyOrder) {
-              try {
-                const data = await fetchPageWithProxy(makeProxy, url);
-                if (data && (data.data || data.badges)) { pageData = data; break; }
-              } catch (_) { continue; }
-            }
-            if (pageData) {
-              collectedBadges = collectedBadges.concat(pageData.data || pageData.badges || []);
-            }
-          } catch (_) { }
+            lastFirstId = currentFirstId;
+            
+            collectedBadges = collectedBadges.concat(batch);
+            page++;
+            
+            // Límite de seguridad de 15 páginas (aprox 750 insignias) por si hay un error en la API
+            if (page > 15) break; 
+          } else {
+            break; // Array vacío, ya no hay más insignias por cargar
+          }
         }
 
         allBadges = collectedBadges;
+        const totalCount = allBadges.length; // Ahora contamos el total real obtenido, no el metadata
         renderStats(totalCount);
+        
         filtered = allBadges;
         skeleton.remove();
         shown = 0;
@@ -1433,7 +1447,6 @@
       const grid = document.getElementById('badges-grid');
       const slice = filtered.slice(shown, shown + PAGE_SIZE);
       slice.forEach(b => {
-        // Estructura real del JSON de Credly
         const tmpl = b.badge_template || b;
         const img = tmpl.image_url || b.image?.url || '';
         const name = tmpl.name || b.name || 'Insignia';
@@ -1461,7 +1474,6 @@
 
     document.getElementById('btn-load-more').onclick = () => renderBadges(false);
 
-    // Search
     let searchTimer;
     document.getElementById('badges-search').addEventListener('input', e => {
       clearTimeout(searchTimer);
@@ -1481,7 +1493,6 @@
 
     fetchAllBadges();
   })();
-
 })();
 </script>
 </body>
