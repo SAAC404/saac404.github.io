@@ -77,12 +77,12 @@ algo nuevo cada semana.`,
   // image: ruta a tu archivo .jpg (sube la imagen a la carpeta assets/certs/)
   certifications: [
     {
-      title: "Responsive Web Design",
-      issuer: "freeCodeCamp",
-      date: "Enero 2024",
-      category: "certificacion",   // "certificacion" | "reconocimiento" | "constancia" | "curso"
-      image: "assets/certs/freecodecamp-rwd.jpg",
-      credential: "https://freecodecamp.org/certification/tu-usuario/responsive-web-design",
+      title: "HRCI Associate Professional in Human Resources-International",
+      issuer: "Coursera / HRCI",
+      date: "Junio 2026",
+      category: "certificacion",
+      image: "assets/certs/coursera-hrci-associate-hr-international.webp",
+      credential: "https://coursera.org/verify/professional-cert/OJ8RON4HBK08",
     },
     {
       title: "JavaScript Algorithms & Data Structures",
