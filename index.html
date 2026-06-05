@@ -267,29 +267,71 @@
     transition: all 0.2s;
   }
   .social-link:hover { border-color: var(--accent); color: var(--accent); }
-  .skills-list { display: flex; flex-direction: column; gap: 1rem; }
-  .skill-item {}
-  .skill-header {
+  .skills-loading {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 6px;
-    font-size: 0.875rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
-  .skill-name { color: var(--text); }
-  .skill-pct { color: var(--text-dim); font-family: 'DM Mono', monospace; font-size: 0.75rem; }
-  .skill-bar {
-    height: 3px;
+  .skill-pill-skeleton {
+    height: 28px;
+    border-radius: 100px;
     background: var(--surface2);
-    border-radius: 100px;
-    overflow: hidden;
+    animation: shimmer 1.4s ease infinite;
   }
-  .skill-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent2), var(--accent));
+  .skills-categories { display: flex; flex-direction: column; gap: 1.5rem; }
+  .skill-category-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.6rem;
+  }
+  .skills-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .skill-pill {
+    font-size: 0.78rem;
+    font-weight: 400;
+    padding: 4px 12px;
     border-radius: 100px;
-    transform-origin: left;
-    transform: scaleX(0);
-    transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    background: var(--surface);
+    white-space: nowrap;
+    transition: all 0.2s;
+    cursor: default;
+  }
+  .skill-pill:hover { border-color: var(--accent); color: var(--accent); }
+  .skill-pill.accent { border-color: rgba(125,244,197,0.25); color: var(--accent); background: var(--accent-dim); }
+  .skill-pill.accent2 { border-color: rgba(91,158,255,0.25); color: var(--accent2); background: var(--accent2-dim); }
+  .skills-show-more {
+    margin-top: 0.75rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    padding: 0;
+    transition: color 0.2s;
+  }
+  .skills-show-more:hover { color: var(--accent); }
+  .skills-total-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+  }
+  .skills-total-badge::before {
+    content: '';
+    display: block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
   }
 
   /* ── PROJECTS ── */
@@ -589,6 +631,167 @@
   footer a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
   footer a:hover { color: var(--accent); }
 
+  /* ── CREDLY BADGES ── */
+  .credly-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .credly-profile-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 400;
+    transition: all 0.2s;
+  }
+  .credly-profile-link:hover { border-color: #F5A623; color: #F5A623; }
+  .credly-profile-link .credly-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #F5A623;
+  }
+  .badges-stats {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+  }
+  .badge-stat { text-align: center; }
+  .badge-stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.5rem;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .badge-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+  }
+  .badges-search-wrap {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .badges-search {
+    flex: 1;
+    min-width: 200px;
+    max-width: 360px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 0.5rem 1.25rem;
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .badges-search::placeholder { color: var(--text-dim); }
+  .badges-search:focus { border-color: var(--border-hover); }
+  .badges-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+  .badges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 1rem;
+  }
+  .badge-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.2s;
+    text-align: center;
+  }
+  .badge-card:hover { border-color: #F5A623; transform: translateY(-2px); }
+  .badge-card img {
+    width: 72px; height: 72px;
+    object-fit: contain;
+  }
+  .badge-name {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .badge-issuer {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+  .badges-load-more {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  .badges-skeleton {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 1rem;
+  }
+  .skeleton-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .skeleton-img {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: var(--surface2);
+    animation: shimmer 1.4s ease infinite;
+  }
+  .skeleton-line {
+    height: 10px;
+    border-radius: 100px;
+    background: var(--surface2);
+    animation: shimmer 1.4s ease infinite;
+  }
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+  }
+  .badges-error {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+  }
+  .badges-error p { margin-bottom: 1rem; }
+
   /* ── ANIMATIONS ── */
   .fade-up {
     opacity: 0;
@@ -624,6 +827,7 @@
     <li><a href="#sobre-mi">Sobre mí</a></li>
     <li><a href="#proyectos">Proyectos</a></li>
     <li><a href="#certificaciones">Certificaciones</a></li>
+    <li><a href="#insignias">Insignias</a></li>
     <li><a href="#contacto" id="nav-contact-link">Contacto</a></li>
   </ul>
   <button class="nav-toggle" id="nav-toggle" aria-label="Menú">☰</button>
@@ -655,8 +859,20 @@
         <h2 class="section-title">Hola, soy <em id="first-name"></em></h2>
         <div class="about-text" id="about-text"></div>
         <div style="margin-top:2.5rem;">
-          <p class="section-label" style="margin-bottom:1.25rem;">Habilidades</p>
-          <div class="skills-list stagger" id="skills-list"></div>
+          <p class="section-label" style="margin-bottom:0.5rem;">Habilidades verificadas</p>
+          <p class="skills-total-badge" id="skills-total-badge" style="display:none;"></p>
+          <div id="skills-list">
+            <div class="skills-loading" id="skills-loading">
+              <div class="skill-pill-skeleton" style="width:80px;"></div>
+              <div class="skill-pill-skeleton" style="width:110px;"></div>
+              <div class="skill-pill-skeleton" style="width:65px;"></div>
+              <div class="skill-pill-skeleton" style="width:95px;"></div>
+              <div class="skill-pill-skeleton" style="width:75px;"></div>
+              <div class="skill-pill-skeleton" style="width:120px;"></div>
+              <div class="skill-pill-skeleton" style="width:85px;"></div>
+              <div class="skill-pill-skeleton" style="width:70px;"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -681,6 +897,34 @@
     <p class="section-sub fade-up">Formación continua y logros obtenidos. Haz clic en cualquier tarjeta para ver el documento completo.</p>
     <div class="cert-filters fade-up" id="cert-filters"></div>
     <div class="certs-grid stagger fade-up" id="certs-grid"></div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- INSIGNIAS CREDLY -->
+  <section id="insignias">
+    <p class="section-label">Credly</p>
+    <div class="credly-header">
+      <div>
+        <h2 class="section-title fade-up">Insignias digitales</h2>
+        <p class="section-sub fade-up" style="margin-bottom:0;">Credenciales verificadas obtenidas en plataformas oficiales. Haz clic en cualquier insignia para verificarla.</p>
+      </div>
+      <a href="https://www.credly.com/users/saac21" target="_blank" rel="noopener" class="credly-profile-link fade-up">
+        <span class="credly-dot"></span>
+        Ver perfil completo en Credly ↗
+      </a>
+    </div>
+    <div class="badges-stats fade-up" id="badges-stats"></div>
+    <div class="badges-search-wrap fade-up">
+      <input type="search" class="badges-search" id="badges-search" placeholder="Buscar insignia..." />
+      <span class="badges-count" id="badges-count"></span>
+    </div>
+    <div id="badges-container">
+      <div class="badges-skeleton" id="badges-skeleton"></div>
+    </div>
+    <div class="badges-load-more" id="badges-load-more" style="display:none;">
+      <button class="btn btn-ghost" id="btn-load-more">Cargar más insignias</button>
+    </div>
   </section>
 
   <!-- CONTACTO -->
@@ -774,22 +1018,127 @@
   if (D.profile.linkedin)
     contactActions.innerHTML += `<a href="${D.profile.linkedin}" target="_blank" rel="noopener" class="btn btn-ghost">LinkedIn ↗</a>`;
 
-  // ── SKILLS ──
-  const skillsList = document.getElementById('skills-list');
-  D.skills.forEach((s, i) => {
-    const el = document.createElement('div');
-    el.className = 'skill-item';
-    el.style.setProperty('--i', i);
-    el.innerHTML = `
-      <div class="skill-header">
-        <span class="skill-name">${s.name}</span>
-        <span class="skill-pct">${s.level}%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-fill" data-level="${s.level / 100}"></div>
-      </div>`;
-    skillsList.appendChild(el);
-  });
+  // ── SKILLS desde Credly ──
+  (function () {
+    const CREDLY_USER = 'saac21';
+    const PREVIEW_COUNT = 24; // pills visibles antes de "ver más"
+
+    // Mapeo de categorías conocidas a colores
+    const CAT_ACCENT = {
+      'Programming': 'accent',
+      'Web Development': 'accent',
+      'Software Development': 'accent',
+      'Database': 'accent2',
+      'Cloud': 'accent2',
+      'Networking': 'accent2',
+      'Security': 'accent2',
+      'DevOps': 'accent2',
+    };
+
+    async function fetchSkills() {
+      try {
+        let page = 1;
+        let allSkills = [];
+        let total = 0;
+        while (true) {
+          const res = await fetch(
+            `https://api.credly.com/v1/obi/v2/public/users/${CREDLY_USER}/skills?page=${page}&page_size=100`
+          );
+          if (!res.ok) throw new Error();
+          const data = await res.json();
+          const items = data.data || [];
+          allSkills = allSkills.concat(items);
+          total = data.metadata?.total_count || allSkills.length;
+          if (allSkills.length >= total || items.length === 0) break;
+          page++;
+        }
+        renderSkills(allSkills, total);
+      } catch (e) {
+        // Fallback a skills de data.js
+        renderFallback();
+      }
+    }
+
+    function renderSkills(skills, total) {
+      document.getElementById('skills-loading').remove();
+
+      // Badge total
+      const badge = document.getElementById('skills-total-badge');
+      badge.textContent = `${total} habilidades verificadas por Credly`;
+      badge.style.display = 'flex';
+
+      // Agrupar por categoría
+      const groups = {};
+      skills.forEach(s => {
+        const cat = s.category?.name || 'Otras';
+        if (!groups[cat]) groups[cat] = [];
+        groups[cat].push(s.name || s);
+      });
+
+      // Ordenar grupos por cantidad desc
+      const sorted = Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
+
+      const container = document.getElementById('skills-list');
+      const wrap = document.createElement('div');
+      wrap.className = 'skills-categories';
+
+      sorted.forEach(([cat, skillNames]) => {
+        const accentClass = CAT_ACCENT[cat] || '';
+        const group = document.createElement('div');
+        const preview = skillNames.slice(0, PREVIEW_COUNT);
+        const rest = skillNames.slice(PREVIEW_COUNT);
+
+        group.innerHTML = `<p class="skill-category-title">${cat} <span style="opacity:0.5;">(${skillNames.length})</span></p>`;
+        const pillsWrap = document.createElement('div');
+        pillsWrap.className = 'skills-pills';
+
+        preview.forEach(name => {
+          const pill = document.createElement('span');
+          pill.className = 'skill-pill' + (accentClass ? ' ' + accentClass : '');
+          pill.textContent = name;
+          pillsWrap.appendChild(pill);
+        });
+
+        group.appendChild(pillsWrap);
+
+        if (rest.length > 0) {
+          const moreBtn = document.createElement('button');
+          moreBtn.className = 'skills-show-more';
+          moreBtn.textContent = `+ ${rest.length} más`;
+          moreBtn.onclick = () => {
+            rest.forEach(name => {
+              const pill = document.createElement('span');
+              pill.className = 'skill-pill' + (accentClass ? ' ' + accentClass : '');
+              pill.textContent = name;
+              pillsWrap.appendChild(pill);
+            });
+            moreBtn.remove();
+          };
+          group.appendChild(moreBtn);
+        }
+
+        wrap.appendChild(group);
+      });
+
+      container.appendChild(wrap);
+    }
+
+    function renderFallback() {
+      document.getElementById('skills-loading').remove();
+      const container = document.getElementById('skills-list');
+      const wrap = document.createElement('div');
+      wrap.className = 'skills-pills';
+      D.skills.forEach(s => {
+        const pill = document.createElement('span');
+        pill.className = 'skill-pill accent';
+        pill.textContent = s.name;
+        wrap.appendChild(pill);
+      });
+      container.appendChild(wrap);
+    }
+
+    fetchSkills();
+  })();
 
   // ── PROJECTS ──
   const grid = document.getElementById('projects-grid');
@@ -933,19 +1282,136 @@
       : 'display:flex;flex-direction:column;position:absolute;top:64px;left:0;right:0;background:rgba(11,14,20,0.97);padding:1.5rem;gap:1.5rem;border-bottom:1px solid var(--border);';
   };
 
-  // ── INTERSECTION OBSERVER: fade-up + skill bars ──
+  // ── INTERSECTION OBSERVER: fade-up ──
   const io = new IntersectionObserver((entries) => {
     entries.forEach(e => {
       if (!e.isIntersecting) return;
       e.target.classList.add('visible');
-      e.target.querySelectorAll('.skill-fill').forEach(bar => {
-        bar.style.transform = `scaleX(${bar.dataset.level})`;
-      });
       io.unobserve(e.target);
     });
   }, { threshold: 0.12 });
 
   document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+
+  // ── CREDLY BADGES ──
+  (function () {
+    const CREDLY_USER = 'saac21';
+    const PAGE_SIZE = 48;
+    let allBadges = [];
+    let filtered = [];
+    let shown = 0;
+
+    // Skeleton placeholders while loading
+    const skeleton = document.getElementById('badges-skeleton');
+    for (let i = 0; i < 12; i++) {
+      skeleton.innerHTML += `
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-line" style="width:80%;"></div>
+          <div class="skeleton-line" style="width:55%;"></div>
+        </div>`;
+    }
+
+    async function fetchAllBadges() {
+      let page = 1;
+      let total = 0;
+      try {
+        while (true) {
+          const url = `https://api.credly.com/v1/obi/v2/public/users/${CREDLY_USER}/badges?page=${page}&page_size=100&sort=-issued_at`;
+          const res = await fetch(url);
+          if (!res.ok) throw new Error('API error');
+          const data = await res.json();
+          const items = data.data || [];
+          allBadges = allBadges.concat(items);
+          total = data.metadata?.total_count || allBadges.length;
+          if (allBadges.length >= total || items.length === 0) break;
+          page++;
+        }
+        renderStats(total);
+        filtered = allBadges;
+        skeleton.remove();
+        shown = 0;
+        renderBadges(true);
+      } catch (err) {
+        skeleton.remove();
+        document.getElementById('badges-container').innerHTML = `
+          <div class="badges-error">
+            <p style="font-size:2rem;">🏅</p>
+            <p style="color:var(--text-muted);">No se pudieron cargar las insignias en este momento.</p>
+            <a href="https://www.credly.com/users/${CREDLY_USER}" target="_blank" rel="noopener" class="btn btn-ghost" style="font-size:0.85rem;">
+              Ver directamente en Credly ↗
+            </a>
+          </div>`;
+      }
+    }
+
+    function renderStats(total) {
+      const statsEl = document.getElementById('badges-stats');
+      // Count unique issuers
+      const issuers = new Set(allBadges.map(b => b.badge?.issuer?.name || b.issuer?.name || '').filter(Boolean));
+      statsEl.innerHTML = `
+        <div class="badge-stat">
+          <div class="badge-stat-num">${total}</div>
+          <div class="badge-stat-label">Insignias</div>
+        </div>
+        <div class="badge-stat">
+          <div class="badge-stat-num">${issuers.size}</div>
+          <div class="badge-stat-label">Emisores</div>
+        </div>`;
+    }
+
+    function renderBadges(reset) {
+      const container = document.getElementById('badges-container');
+      if (reset) {
+        container.innerHTML = '<div class="badges-grid" id="badges-grid"></div>';
+        shown = 0;
+      }
+      const grid = document.getElementById('badges-grid');
+      const slice = filtered.slice(shown, shown + PAGE_SIZE);
+      slice.forEach(b => {
+        const img = b.badge?.image_url || b.image?.url || '';
+        const name = b.badge?.name || b.name || 'Insignia';
+        const issuer = b.badge?.issuer?.name || b.issuer?.name || '';
+        const url = b.badge_url || b.public_url || `https://www.credly.com/users/${CREDLY_USER}`;
+        const card = document.createElement('a');
+        card.className = 'badge-card';
+        card.href = url;
+        card.target = '_blank';
+        card.rel = 'noopener';
+        card.setAttribute('aria-label', name);
+        card.innerHTML = `
+          <img src="${img}" alt="${name}" loading="lazy" width="72" height="72" />
+          <span class="badge-name">${name}</span>
+          <span class="badge-issuer">${issuer}</span>`;
+        grid.appendChild(card);
+      });
+      shown += slice.length;
+      document.getElementById('badges-count').textContent = `${filtered.length} insignias`;
+      const loadMoreWrap = document.getElementById('badges-load-more');
+      loadMoreWrap.style.display = shown < filtered.length ? 'flex' : 'none';
+    }
+
+    document.getElementById('btn-load-more').onclick = () => renderBadges(false);
+
+    // Search
+    let searchTimer;
+    document.getElementById('badges-search').addEventListener('input', e => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        const q = e.target.value.toLowerCase().trim();
+        filtered = q
+          ? allBadges.filter(b => {
+              const name = (b.badge?.name || b.name || '').toLowerCase();
+              const issuer = (b.badge?.issuer?.name || b.issuer?.name || '').toLowerCase();
+              return name.includes(q) || issuer.includes(q);
+            })
+          : allBadges;
+        renderBadges(true);
+      }, 300);
+    });
+
+    fetchAllBadges();
+  })();
 
 })();
 </script>

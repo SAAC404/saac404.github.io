@@ -7,10 +7,10 @@ const PORTFOLIO_DATA = {
 
   // ── PERFIL ──────────────────────────────────────────────
   profile: {
-    name: "Sergio Acevedo ",
+    name: "Tu Nombre Completo",
     title: "Desarrollador Web Full Stack",
     tagline: "Construyo experiencias digitales modernas y funcionales",
-    email: "sergioarmandoacevedo@gmail.com",
+    email: "tuemail@ejemplo.com",
     github: "https://github.com/tu-usuario",
     linkedin: "https://linkedin.com/in/tu-usuario",
     avatar: "assets/avatar.jpg",  // Pon tu foto aquí, o deja "" para usar iniciales
