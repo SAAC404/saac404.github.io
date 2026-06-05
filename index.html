@@ -1037,45 +1037,55 @@
 
     async function fetchSkills() {
       try {
-        let page = 1;
-        let allSkills = [];
-        let total = 0;
-        while (true) {
-          const res = await fetch(
-            `https://api.credly.com/v1/obi/v2/public/users/${CREDLY_USER}/skills?page=${page}&page_size=100`
-          );
-          if (!res.ok) throw new Error();
-          const data = await res.json();
-          const items = data.data || [];
-          allSkills = allSkills.concat(items);
-          total = data.metadata?.total_count || allSkills.length;
-          if (allSkills.length >= total || items.length === 0) break;
-          page++;
+        const proxies = [
+          url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+          url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+        ];
+        const credlyUrl = `https://www.credly.com/users/${CREDLY_USER}/badges.json`;
+        let data = null;
+        for (const makeProxy of proxies) {
+          try {
+            const res = await fetch(makeProxy(credlyUrl));
+            if (!res.ok) continue;
+            const text = await res.text();
+            data = JSON.parse(text);
+            if (data) break;
+          } catch (_) { continue; }
         }
-        renderSkills(allSkills, total);
+        if (!data) throw new Error('all proxies failed');
+        const badges = data.data || data.badges || [];
+        const skillsByIssuer = {};
+        const skillSet = new Set();
+        badges.forEach(b => {
+          const tmpl = b.badge_template || {};
+          const issuerName = tmpl.issuer?.entities?.[0]?.entity?.name || tmpl.issuer_name || 'Otras';
+          (tmpl.skills || []).forEach(s => {
+            const name = s.name || s;
+            if (!name) return;
+            skillSet.add(name);
+            if (!skillsByIssuer[issuerName]) skillsByIssuer[issuerName] = new Set();
+            skillsByIssuer[issuerName].add(name);
+          });
+        });
+        if (skillSet.size > 0) {
+          const grouped = {};
+          Object.entries(skillsByIssuer).forEach(([k, v]) => { grouped[k] = [...v]; });
+          renderSkills(grouped, skillSet.size);
+        } else {
+          renderFallback();
+        }
       } catch (e) {
-        // Fallback a skills de data.js
         renderFallback();
       }
     }
 
-    function renderSkills(skills, total) {
+    function renderSkills(groups, total) {
       document.getElementById('skills-loading').remove();
 
-      // Badge total
       const badge = document.getElementById('skills-total-badge');
       badge.textContent = `${total} habilidades verificadas por Credly`;
       badge.style.display = 'flex';
 
-      // Agrupar por categoría
-      const groups = {};
-      skills.forEach(s => {
-        const cat = s.category?.name || 'Otras';
-        if (!groups[cat]) groups[cat] = [];
-        groups[cat].push(s.name || s);
-      });
-
-      // Ordenar grupos por cantidad desc
       const sorted = Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
 
       const container = document.getElementById('skills-list');
@@ -1313,16 +1323,28 @@
     }
 
     async function fetchAllBadges() {
+      const proxies = [
+        url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+        url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+        url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+      ];
+      const credlyUrl = `https://www.credly.com/users/${CREDLY_USER}/badges.json`;
+      let data = null;
       try {
-        // Endpoint público de Credly + proxy AllOrigins para evitar bloqueo CORS
-        const credlyUrl = `https://www.credly.com/users/${CREDLY_USER}/badges.json`;
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(credlyUrl)}`;
-        const res = await fetch(proxyUrl);
-        if (!res.ok) throw new Error('proxy error');
-        const wrapper = await res.json();
-        const data = JSON.parse(wrapper.contents);
-        // El JSON de Credly tiene { badges: [...], metadata: {...} }
-        allBadges = data.badges || data.data || [];
+        for (const makeProxy of proxies) {
+          try {
+            const res = await fetch(makeProxy(credlyUrl));
+            if (!res.ok) continue;
+            const text = await res.text();
+            // allorigins devuelve { contents: "..." }, los demás devuelven JSON directo
+            let parsed;
+            try { parsed = JSON.parse(text); } catch { continue; }
+            data = parsed.contents ? JSON.parse(parsed.contents) : parsed;
+            if (data && (data.data || data.badges)) break;
+          } catch (_) { continue; }
+        }
+        if (!data) throw new Error('all proxies failed');
+        allBadges = data.data || data.badges || [];
         const total = data.metadata?.total_count || allBadges.length;
         renderStats(total);
         filtered = allBadges;
