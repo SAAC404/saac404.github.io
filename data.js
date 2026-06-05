@@ -84,7 +84,7 @@ algo nuevo cada semana.`,
       image: "assets/certs/coursera-hrci-associate-hr-international.webp",
       credential: "https://coursera.org/verify/professional-cert/OJ8RON4HBK08",
     },
-    {
+    /*{
       title: "JavaScript Algorithms & Data Structures",
       issuer: "freeCodeCamp",
       date: "Febrero 2024",
@@ -123,7 +123,7 @@ algo nuevo cada semana.`,
       category: "certificacion",
       image: "assets/certs/coursera-node.jpg",
       credential: "https://coursera.org/verify/ABC123",
-    },
+    },*/
   ],
 
 };
