@@ -80,7 +80,8 @@ algo nuevo cada semana.`,
       title: "HRCI Associate Professional in Human Resources-International",
       issuer: "Coursera / HRCI",
       date: "Junio 2026",
-      category: "certificacion",
+      category: "certificacion",   // tipo de documento
+      area: "rrhh",                // área temática
       image: "assets/certs/coursera-hrci-associate-hr-international.webp",
       credential: "https://coursera.org/verify/professional-cert/OJ8RON4HBK08",
     },
@@ -89,16 +90,18 @@ algo nuevo cada semana.`,
       issuer: "Coursera / Practical Growth",
       date: "Mayo 2026",
       category: "certificacion",
+      area: "rrhh",
       image: "assets/certs/coursera-recruiting-onboarding-workforce.webp",
       credential: "https://coursera.org/verify/specialization/YMXUTAW0H8RN",
     },
     {
-      title: "JavaScript Algorithms & Data Structures",
-      issuer: "freeCodeCamp",
-      date: "Febrero 2024",
+      title: "Fundamentos de la administración de proyectos con herramientas Microsoft",
+      issuer: "CONOCER / Grupo EduIT",
+      date: "Febrero 2026",
       category: "certificacion",
-      image: "assets/certs/freecodecamp-js.jpg",
-      credential: "https://freecodecamp.org/certification/tu-usuario/javascript-algorithms-and-data-structures",
+      area: "management", // gestión / proyectos
+      image: "assets/certs/conocer-fundamentos-admin-proyectos-microsoft.webp",
+      credential: "", // si hay URL oficial de verificación, la pones aquí
     },
     {
       title: "React - De Cero a Experto",
